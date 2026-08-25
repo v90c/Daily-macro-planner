@@ -136,12 +136,15 @@ export default function MacroPlanner() {
 
         <div
           style={{
+            position: "sticky",
+            top: 12,
+            zIndex: 20,
             background: "#fff",
             borderRadius: 12,
             padding: "18px 20px",
             marginBottom: 24,
             border: "1px solid #eee",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
