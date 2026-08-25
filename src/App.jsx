@@ -25,12 +25,12 @@ const MEALS = {
     { id: "s4", name: "Non-fat cheese + celery sticks", protein: 20, fat: 4, carbs: 3, kcal: 130 },
   ],
   dinner: [
-    { id: "d1", name: "Cod + olive oil + almonds + avocado + spinach", protein: 47, fat: 72, carbs: 13, kcal: 900 },
-    { id: "d2", name: "Chicken thigh + olive oil + peanut butter + avocado + courgette", protein: 48, fat: 68, carbs: 15, kcal: 850 },
-    { id: "d3", name: "Duck breast + olive oil + leafy greens + cauliflower", protein: 55, fat: 60, carbs: 12, kcal: 780 },
-    { id: "d4", name: "Haddock + coconut oil + cashews + avocado + rocket", protein: 44, fat: 65, carbs: 12, kcal: 820 },
-    { id: "d5", name: "Chicken breast + sesame oil + sesame seeds + mushroom + green beans", protein: 53, fat: 60, carbs: 12, kcal: 800 },
-    { id: "d6", name: "Firm tofu + smoked salmon + olive oil + walnuts + spinach", protein: 40, fat: 70, carbs: 10, kcal: 790 },
+    { id: "d1", name: "Cod + olive oil + avocado", protein: 42, fat: 62, carbs: 8, kcal: 780 },
+    { id: "d2", name: "Chicken thigh + olive oil + avocado", protein: 46, fat: 58, carbs: 6, kcal: 750 },
+    { id: "d3", name: "Duck breast + olive oil + leafy greens", protein: 55, fat: 55, carbs: 6, kcal: 720 },
+    { id: "d4", name: "Haddock + coconut oil + avocado", protein: 40, fat: 58, carbs: 6, kcal: 720 },
+    { id: "d5", name: "Chicken breast + sesame oil + green beans", protein: 50, fat: 53, carbs: 9, kcal: 700 },
+    { id: "d6", name: "Firm tofu + smoked salmon + olive oil + spinach", protein: 38, fat: 62, carbs: 4, kcal: 720 },
   ],
   shake: [
     { id: "p1", name: "Whey + water", protein: 20, fat: 1.5, carbs: 2, kcal: 100 },
@@ -181,21 +181,40 @@ export default function MacroPlanner() {
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "center",
+                      gap: 12,
+                      minHeight: 44,
                       background: isSelected ? "#111" : "#fff",
                       color: isSelected ? "#fff" : "#222",
-                      border: isSelected ? "1px solid #111" : "1px solid #eaeaea",
-                      borderRadius: 8,
-                      padding: "10px 14px",
+                      border: isSelected ? "2px solid #111" : "2px solid #eaeaea",
+                      borderRadius: 10,
+                      padding: "12px 16px",
                       cursor: "pointer",
                       transition: "all 0.15s ease",
                     }}
                   >
-                    <span style={{ fontSize: 13.5, fontWeight: isSelected ? 600 : 500, paddingRight: 12 }}>
+                    <span
+                      style={{
+                        width: 20,
+                        height: 20,
+                        flexShrink: 0,
+                        borderRadius: "50%",
+                        border: isSelected ? "none" : "2px solid #ccc",
+                        background: isSelected ? "#d61f2c" : "transparent",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 12,
+                        color: "#fff",
+                      }}
+                    >
+                      {isSelected ? "✓" : ""}
+                    </span>
+                    <span style={{ fontSize: 14.5, fontWeight: isSelected ? 600 : 500, flex: 1 }}>
                       {item.name}
                     </span>
                     <span
                       style={{
-                        fontSize: 11.5,
+                        fontSize: 12,
                         whiteSpace: "nowrap",
                         color: isSelected ? "#ccc" : "#999",
                         fontVariantNumeric: "tabular-nums",
