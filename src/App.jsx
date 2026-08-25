@@ -1,50 +1,65 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 
 const TARGETS = { protein: 150, fat: 100, carbs: 50, kcal: 1700 };
 
-const MEALS = {
-  breakfast: [
-    { id: "b1", name: "Coconut flakes + protein powder + almond milk", protein: 23, fat: 24, carbs: 5, kcal: 320 },
-    { id: "b2", name: "0% Greek yoghurt + mixed berries", protein: 16, fat: 1, carbs: 18, kcal: 145 },
-    { id: "b3", name: "3 whole eggs + 2 egg whites, scrambled, spinach", protein: 27, fat: 15, carbs: 2, kcal: 260 },
-    { id: "b4", name: "Protein powder + almond butter + almond milk, blended", protein: 24, fat: 22, carbs: 4, kcal: 300 },
-    { id: "b5", name: "Non-fat Greek yoghurt + chia seeds", protein: 24, fat: 9, carbs: 5, kcal: 210 },
-  ],
-  lunch: [
-    { id: "l1", name: "Chicken breast + mixed salad + olive oil", protein: 50, fat: 16, carbs: 10, kcal: 380 },
-    { id: "l2", name: "Cod or haddock + mixed salad + olive oil", protein: 40, fat: 16, carbs: 10, kcal: 340 },
-    { id: "l3", name: "Turkey breast + mixed salad + olive oil", protein: 46, fat: 15, carbs: 10, kcal: 350 },
-    { id: "l4", name: "3 whole eggs + 2 egg whites + mixed salad + olive oil", protein: 27, fat: 25, carbs: 4, kcal: 340 },
-    { id: "l5", name: "Firm tofu + mixed salad + sesame oil", protein: 20, fat: 20, carbs: 8, kcal: 290 },
-    { id: "l6", name: "Smoked salmon + mixed salad + olive oil", protein: 20, fat: 20, carbs: 4, kcal: 280 },
-  ],
-  snack: [
-    { id: "s1", name: "Cottage cheese + almonds", protein: 17, fat: 8, carbs: 6, kcal: 165 },
-    { id: "s2", name: "Non-fat Greek yoghurt + walnuts", protein: 20, fat: 10, carbs: 8, kcal: 195 },
-    { id: "s3", name: "2 hard-boiled eggs + almonds", protein: 15, fat: 12, carbs: 2, kcal: 175 },
-    { id: "s4", name: "Non-fat cheese + celery sticks", protein: 20, fat: 4, carbs: 3, kcal: 130 },
-  ],
-  dinner: [
-    { id: "d1", name: "Cod + olive oil + avocado", protein: 42, fat: 62, carbs: 8, kcal: 780 },
-    { id: "d2", name: "Chicken thigh + peanut butter + courgette", protein: 48, fat: 60, carbs: 10, kcal: 760 },
-    { id: "d3", name: "Duck breast + walnuts + cauliflower", protein: 55, fat: 58, carbs: 8, kcal: 760 },
-    { id: "d4", name: "Haddock + coconut oil + rocket", protein: 40, fat: 58, carbs: 5, kcal: 700 },
-    { id: "d5", name: "Chicken breast + sesame oil + green beans", protein: 50, fat: 53, carbs: 9, kcal: 700 },
-    { id: "d6", name: "Firm tofu + smoked salmon + olive oil + spinach", protein: 40, fat: 62, carbs: 6, kcal: 760 },
-  ],
-  shake: [
-    { id: "p1", name: "Whey + water", protein: 20, fat: 1.5, carbs: 2, kcal: 100 },
-    { id: "p2", name: "Whey + almond milk", protein: 21, fat: 4, carbs: 3, kcal: 130 },
-  ],
-};
+const DAY_PLANS = [
+  {
+    id: "plan1",
+    name: "Classic",
+    meals: [
+      { label: "Breakfast", name: "0% Greek yoghurt + mixed berries", protein: 16, fat: 1, carbs: 18, kcal: 145 },
+      { label: "Lunch", name: "Chicken breast + mixed salad + olive oil", protein: 50, fat: 16, carbs: 10, kcal: 380 },
+      { label: "Snack", name: "Non-fat Greek yoghurt + walnuts", protein: 20, fat: 10, carbs: 8, kcal: 195 },
+      { label: "Dinner", name: "Cod + olive oil + avocado", protein: 42, fat: 62, carbs: 8, kcal: 780 },
+      { label: "Shake", name: "Whey + almond milk", protein: 21, fat: 4, carbs: 3, kcal: 130 },
+    ],
+  },
+  {
+    id: "plan2",
+    name: "Lean",
+    meals: [
+      { label: "Breakfast", name: "Non-fat Greek yoghurt + chia seeds", protein: 24, fat: 9, carbs: 5, kcal: 210 },
+      { label: "Lunch", name: "Turkey breast + mixed salad + olive oil", protein: 46, fat: 15, carbs: 10, kcal: 350 },
+      { label: "Snack", name: "Cottage cheese + almonds", protein: 17, fat: 8, carbs: 6, kcal: 165 },
+      { label: "Dinner", name: "Chicken thigh + peanut butter + courgette", protein: 48, fat: 60, carbs: 10, kcal: 760 },
+      { label: "Shake", name: "Whey + water", protein: 20, fat: 1.5, carbs: 2, kcal: 100 },
+    ],
+  },
+  {
+    id: "plan3",
+    name: "High Protein",
+    meals: [
+      { label: "Breakfast", name: "3 whole eggs + 2 egg whites, scrambled, spinach", protein: 27, fat: 15, carbs: 2, kcal: 260 },
+      { label: "Lunch", name: "Firm tofu + mixed salad + sesame oil", protein: 20, fat: 20, carbs: 8, kcal: 290 },
+      { label: "Snack", name: "2 hard-boiled eggs + almonds", protein: 15, fat: 12, carbs: 2, kcal: 175 },
+      { label: "Dinner", name: "Duck breast + walnuts + cauliflower", protein: 55, fat: 58, carbs: 8, kcal: 760 },
+      { label: "Shake", name: "Whey + almond milk", protein: 21, fat: 4, carbs: 3, kcal: 130 },
+    ],
+  },
+  {
+    id: "plan4",
+    name: "Light & Simple",
+    meals: [
+      { label: "Breakfast", name: "Protein powder + almond butter + almond milk, blended", protein: 24, fat: 22, carbs: 4, kcal: 300 },
+      { label: "Lunch", name: "Cod or haddock + mixed salad + olive oil", protein: 40, fat: 16, carbs: 10, kcal: 340 },
+      { label: "Snack", name: "Non-fat cheese + celery sticks", protein: 20, fat: 4, carbs: 3, kcal: 130 },
+      { label: "Dinner", name: "Firm tofu + smoked salmon + olive oil + spinach", protein: 40, fat: 62, carbs: 6, kcal: 760 },
+      { label: "Shake", name: "Whey + water", protein: 20, fat: 1.5, carbs: 2, kcal: 100 },
+    ],
+  },
+];
 
-const CATEGORY_LABELS = {
-  breakfast: "Breakfast",
-  lunch: "Lunch",
-  snack: "Snack",
-  dinner: "Dinner",
-  shake: "Post-training shake",
-};
+function sumMacros(meals) {
+  return meals.reduce(
+    (t, m) => ({
+      protein: t.protein + m.protein,
+      fat: t.fat + m.fat,
+      carbs: t.carbs + m.carbs,
+      kcal: t.kcal + m.kcal,
+    }),
+    { protein: 0, fat: 0, carbs: 0, kcal: 0 }
+  );
+}
 
 function MacroBar({ label, value, target, unit, color }) {
   const pct = Math.min(100, (value / target) * 100);
@@ -72,34 +87,16 @@ function MacroBar({ label, value, target, unit, color }) {
 }
 
 export default function MacroPlanner() {
-  const [selected, setSelected] = useState({
-    breakfast: null,
-    lunch: null,
-    snack: null,
-    dinner: null,
-    shake: null,
-  });
+  const [selectedPlanId, setSelectedPlanId] = useState(null);
 
-  const totals = useMemo(() => {
-    const t = { protein: 0, fat: 0, carbs: 0, kcal: 0 };
-    Object.entries(selected).forEach(([cat, id]) => {
-      if (!id) return;
-      const item = MEALS[cat].find((m) => m.id === id);
-      if (item) {
-        t.protein += item.protein;
-        t.fat += item.fat;
-        t.carbs += item.carbs;
-        t.kcal += item.kcal;
-      }
-    });
-    return t;
-  }, [selected]);
+  const selectedPlan = DAY_PLANS.find((p) => p.id === selectedPlanId) || null;
+  const totals = selectedPlan ? sumMacros(selectedPlan.meals) : { protein: 0, fat: 0, carbs: 0, kcal: 0 };
 
-  const selectMeal = (cat, id) => {
-    setSelected((prev) => ({ ...prev, [cat]: prev[cat] === id ? null : id }));
+  const selectPlan = (id) => {
+    setSelectedPlanId((prev) => (prev === id ? null : id));
   };
 
-  const reset = () => setSelected({ breakfast: null, lunch: null, snack: null, dinner: null, shake: null });
+  const reset = () => setSelectedPlanId(null);
 
   return (
     <div
@@ -131,7 +128,7 @@ export default function MacroPlanner() {
           </button>
         </div>
         <p style={{ fontSize: 13, color: "#777", marginTop: 0, marginBottom: 20 }}>
-          Pick one option per meal slot. Totals update live against your daily targets.
+          Pick a full day plan below. Each one is pre-balanced to fit your daily targets.
         </p>
 
         <div
@@ -148,7 +145,9 @@ export default function MacroPlanner() {
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-            <span style={{ fontWeight: 700, fontSize: 14, color: "#111" }}>Today's totals</span>
+            <span style={{ fontWeight: 700, fontSize: 14, color: "#111" }}>
+              {selectedPlan ? `${selectedPlan.name} — today's totals` : "Today's totals"}
+            </span>
             <span style={{ fontSize: 22, fontWeight: 800, color: "#d61f2c" }}>{totals.kcal.toFixed(0)} kcal</span>
           </div>
           <MacroBar label="Protein" value={totals.protein} target={TARGETS.protein} unit="g" color="#d61f2c" />
@@ -156,78 +155,98 @@ export default function MacroPlanner() {
           <MacroBar label="Carbs" value={totals.carbs} target={TARGETS.carbs} unit="g" color="#7f8c8d" />
         </div>
 
-        {Object.keys(MEALS).map((cat) => (
-          <div key={cat} style={{ marginBottom: 22 }}>
-            <h2
-              style={{
-                fontSize: 12,
-                letterSpacing: 1,
-                textTransform: "uppercase",
-                color: "#999",
-                fontWeight: 700,
-                marginBottom: 8,
-              }}
-            >
-              {CATEGORY_LABELS[cat]}
-            </h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {MEALS[cat].map((item) => {
-                const isSelected = selected[cat] === item.id;
-                return (
-                  <div
-                    key={item.id}
-                    onClick={() => selectMeal(cat, item.id)}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {DAY_PLANS.map((plan) => {
+            const isSelected = selectedPlanId === plan.id;
+            const planTotals = sumMacros(plan.meals);
+            return (
+              <div
+                key={plan.id}
+                onClick={() => selectPlan(plan.id)}
+                style={{
+                  background: isSelected ? "#111" : "#fff",
+                  color: isSelected ? "#fff" : "#222",
+                  border: isSelected ? "2px solid #111" : "2px solid #eaeaea",
+                  borderRadius: 12,
+                  padding: "16px 18px",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                  <span
                     style={{
+                      width: 22,
+                      height: 22,
+                      flexShrink: 0,
+                      borderRadius: "50%",
+                      border: isSelected ? "none" : "2px solid #ccc",
+                      background: isSelected ? "#d61f2c" : "transparent",
                       display: "flex",
-                      justifyContent: "space-between",
                       alignItems: "center",
-                      gap: 12,
-                      minHeight: 44,
-                      background: isSelected ? "#111" : "#fff",
-                      color: isSelected ? "#fff" : "#222",
-                      border: isSelected ? "2px solid #111" : "2px solid #eaeaea",
-                      borderRadius: 10,
-                      padding: "12px 16px",
-                      cursor: "pointer",
-                      transition: "all 0.15s ease",
+                      justifyContent: "center",
+                      fontSize: 13,
+                      color: "#fff",
                     }}
                   >
-                    <span
+                    {isSelected ? "✓" : ""}
+                  </span>
+                  <span style={{ fontSize: 16, fontWeight: 700 }}>{plan.name}</span>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 12 }}>
+                  {plan.meals.map((meal) => (
+                    <div
+                      key={meal.label}
                       style={{
-                        width: 20,
-                        height: 20,
-                        flexShrink: 0,
-                        borderRadius: "50%",
-                        border: isSelected ? "none" : "2px solid #ccc",
-                        background: isSelected ? "#d61f2c" : "transparent",
                         display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: 12,
-                        color: "#fff",
+                        justifyContent: "space-between",
+                        alignItems: "baseline",
+                        gap: 12,
+                        fontSize: 13,
                       }}
                     >
-                      {isSelected ? "✓" : ""}
-                    </span>
-                    <span style={{ fontSize: 14.5, fontWeight: isSelected ? 600 : 500, flex: 1 }}>
-                      {item.name}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: 12,
-                        whiteSpace: "nowrap",
-                        color: isSelected ? "#ccc" : "#999",
-                        fontVariantNumeric: "tabular-nums",
-                      }}
-                    >
-                      P{item.protein} F{item.fat} C{item.carbs} · {item.kcal}kcal
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+                      <span style={{ color: isSelected ? "#ddd" : "#444" }}>
+                        <span style={{ fontWeight: 600, color: isSelected ? "#fff" : "#111" }}>{meal.label}:</span>{" "}
+                        {meal.name}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 11.5,
+                          whiteSpace: "nowrap",
+                          color: isSelected ? "#999" : "#999",
+                          fontVariantNumeric: "tabular-nums",
+                        }}
+                      >
+                        {meal.kcal}kcal
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    paddingTop: 10,
+                    borderTop: isSelected ? "1px solid #333" : "1px solid #eee",
+                    fontSize: 12.5,
+                    fontVariantNumeric: "tabular-nums",
+                    color: isSelected ? "#ccc" : "#666",
+                  }}
+                >
+                  <span>
+                    P{planTotals.protein} · F{planTotals.fat} · C{planTotals.carbs}
+                  </span>
+                  <span style={{ fontWeight: 700, color: isSelected ? "#fff" : "#111" }}>
+                    {planTotals.kcal} kcal
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
