@@ -26,11 +26,11 @@ const MEALS = {
   ],
   dinner: [
     { id: "d1", name: "Cod + olive oil + avocado", protein: 42, fat: 62, carbs: 8, kcal: 780 },
-    { id: "d2", name: "Chicken thigh + olive oil + avocado", protein: 46, fat: 58, carbs: 6, kcal: 750 },
-    { id: "d3", name: "Duck breast + olive oil + leafy greens", protein: 55, fat: 55, carbs: 6, kcal: 720 },
-    { id: "d4", name: "Haddock + coconut oil + avocado", protein: 40, fat: 58, carbs: 6, kcal: 720 },
+    { id: "d2", name: "Chicken thigh + peanut butter + courgette", protein: 48, fat: 60, carbs: 10, kcal: 760 },
+    { id: "d3", name: "Duck breast + walnuts + cauliflower", protein: 55, fat: 58, carbs: 8, kcal: 760 },
+    { id: "d4", name: "Haddock + coconut oil + rocket", protein: 40, fat: 58, carbs: 5, kcal: 700 },
     { id: "d5", name: "Chicken breast + sesame oil + green beans", protein: 50, fat: 53, carbs: 9, kcal: 700 },
-    { id: "d6", name: "Firm tofu + smoked salmon + olive oil + spinach", protein: 38, fat: 62, carbs: 4, kcal: 720 },
+    { id: "d6", name: "Firm tofu + smoked salmon + olive oil + spinach", protein: 40, fat: 62, carbs: 6, kcal: 760 },
   ],
   shake: [
     { id: "p1", name: "Whey + water", protein: 20, fat: 1.5, carbs: 2, kcal: 100 },
