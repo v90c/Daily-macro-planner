@@ -5,7 +5,7 @@ const TARGETS = { protein: 150, fat: 100, carbs: 50, kcal: 1700 };
 const DAY_PLANS = [
   {
     id: "plan1",
-    name: "Classic",
+    name: "Day 1",
     meals: [
       { label: "Breakfast", name: "200g 0% Greek yoghurt + 100g mixed berries", protein: 21, fat: 1, carbs: 19, kcal: 162 },
       { label: "Lunch", name: "150g chicken breast + 150g mixed salad + 15g olive oil", protein: 50, fat: 21, carbs: 5, kcal: 410 },
@@ -16,7 +16,7 @@ const DAY_PLANS = [
   },
   {
     id: "plan2",
-    name: "Lean",
+    name: "Day 2",
     meals: [
       { label: "Breakfast", name: "200g non-fat Greek yoghurt + 20g chia seeds", protein: 23, fat: 7, carbs: 16, kcal: 207 },
       { label: "Lunch", name: "120g turkey breast + 150g mixed salad + 20g olive oil", protein: 38, fat: 22, carbs: 5, kcal: 369 },
@@ -27,7 +27,7 @@ const DAY_PLANS = [
   },
   {
     id: "plan3",
-    name: "High Protein",
+    name: "Day 3",
     meals: [
       { label: "Breakfast", name: "3 whole eggs + 2 egg whites, scrambled, 50g spinach", protein: 28, fat: 15, carbs: 3, kcal: 262 },
       { label: "Lunch", name: "260g firm tofu + 150g mixed salad + 6g sesame oil", protein: 45, fat: 30, carbs: 10, kcal: 457 },
@@ -38,13 +38,57 @@ const DAY_PLANS = [
   },
   {
     id: "plan4",
-    name: "Light & Simple",
+    name: "Day 4",
     meals: [
       { label: "Breakfast", name: "1 scoop whey + 25g almond butter + 200ml almond milk + 80g banana, blended", protein: 31, fat: 18, carbs: 27, kcal: 375 },
       { label: "Lunch", name: "160g haddock + 150g mixed salad + 22g olive oil", protein: 41, fat: 24, carbs: 5, kcal: 410 },
       { label: "Snack", name: "100g non-fat cheese + 100g celery sticks", protein: 14, fat: 1, carbs: 7, kcal: 86 },
       { label: "Dinner", name: "120g firm tofu + 100g smoked salmon + 30g olive oil + 60g avocado + 60g spinach", protein: 40, fat: 54, carbs: 10, kcal: 665 },
       { label: "Shake", name: "1 scoop whey (30g) + water", protein: 24, fat: 2, carbs: 3, kcal: 120 },
+    ],
+  },
+  {
+    id: "plan5",
+    name: "Day 5",
+    meals: [
+      { label: "Breakfast", name: "2 whole eggs + 12g oats + 150ml almond milk + 12g almond butter", protein: 18, fat: 19, carbs: 12, kcal: 287 },
+      { label: "Lunch", name: "180g prawns + 150g mixed salad + 22g olive oil + 60g avocado", protein: 47, fat: 34, carbs: 10, kcal: 499 },
+      { label: "Snack", name: "80g edamame + 1 whole egg", protein: 15, fat: 9, carbs: 8, kcal: 169 },
+      { label: "Dinner", name: "160g turkey mince + 40g brown rice + 120g broccoli + 20g olive oil", protein: 49, fat: 34, carbs: 18, kcal: 544 },
+      { label: "Shake", name: "1 scoop whey (30g) + water", protein: 24, fat: 2, carbs: 3, kcal: 120 },
+    ],
+  },
+  {
+    id: "plan6",
+    name: "Day 6",
+    meals: [
+      { label: "Breakfast", name: "180g 0% Greek yoghurt + 15g granola + 10g walnuts", protein: 21, fat: 9, carbs: 17, kcal: 235 },
+      { label: "Lunch", name: "160g salmon fillet + 35g quinoa + 60g spinach + 10g olive oil", protein: 43, fat: 32, carbs: 10, kcal: 477 },
+      { label: "Snack", name: "90g tinned tuna + 70g avocado", protein: 25, fat: 11, carbs: 6, kcal: 216 },
+      { label: "Dinner", name: "145g beef steak + 40g sweet potato + 120g green beans + 26g olive oil", protein: 45, fat: 41, carbs: 16, kcal: 602 },
+      { label: "Shake", name: "1 scoop whey (30g) + 200ml almond milk", protein: 25, fat: 4, carbs: 4, kcal: 150 },
+    ],
+  },
+  {
+    id: "plan7",
+    name: "Day 7",
+    meals: [
+      { label: "Breakfast", name: "180g cottage cheese + 50g pineapple + 20g walnuts", protein: 23, fat: 17, carbs: 15, kcal: 302 },
+      { label: "Lunch", name: "140g chicken breast + 30g chickpeas + 100g mixed salad + 24g olive oil", protein: 48, fat: 30, carbs: 11, kcal: 512 },
+      { label: "Snack", name: "60g hummus + 60g carrot sticks", protein: 5, fat: 6, carbs: 13, kcal: 131 },
+      { label: "Dinner", name: "170g pork tenderloin + 30g lentils + 120g broccoli + 35g olive oil", protein: 52, fat: 42, carbs: 14, kcal: 628 },
+      { label: "Shake", name: "1 scoop whey (30g) + water", protein: 24, fat: 2, carbs: 3, kcal: 120 },
+    ],
+  },
+  {
+    id: "plan8",
+    name: "Day 8",
+    meals: [
+      { label: "Breakfast", name: "2 whole eggs + 2 egg whites + 15g oats + 40g mixed berries", protein: 22, fat: 11, carbs: 16, kcal: 257 },
+      { label: "Lunch", name: "170g turkey breast + 150g mixed salad + 20g olive oil", protein: 52, fat: 22, carbs: 5, kcal: 436 },
+      { label: "Snack", name: "70g apple + 15g almond butter", protein: 3, fat: 8, carbs: 13, kcal: 129 },
+      { label: "Dinner", name: "190g cod + 32g coconut oil + 120g avocado + 100g green beans", protein: 48, fat: 52, carbs: 18, kcal: 698 },
+      { label: "Shake", name: "1 scoop whey (30g) + 200ml almond milk", protein: 25, fat: 4, carbs: 4, kcal: 150 },
     ],
   },
 ];
