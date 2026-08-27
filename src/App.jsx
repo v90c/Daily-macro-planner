@@ -1,109 +1,142 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 
 const TARGETS = { protein: 150, fat: 100, carbs: 50, kcal: 1700 };
 
-const DAY_PLANS = [
-  {
-    id: "plan1",
-    name: "Day 1",
-    meals: [
-      { label: "Breakfast", name: "150g 0% Greek yoghurt + 1 scoop whey (30g), mixed in", protein: 39, fat: 2, carbs: 8, kcal: 203 },
-      { label: "Lunch", name: "100g chicken breast + 150g mixed salad + 15g olive oil", protein: 34, fat: 19, carbs: 5, kcal: 328 },
-      { label: "Snack", name: "120g cottage cheese + 28g walnuts + 80g mixed berries", protein: 17, fat: 26, carbs: 16, kcal: 350 },
-      { label: "Dinner", name: "160g cod + 24g olive oil + 150g avocado", protein: 40, fat: 48, carbs: 14, kcal: 620 },
-      { label: "Shake", name: "1 scoop whey (30g) + 200ml almond milk", protein: 25, fat: 4, carbs: 4, kcal: 150 },
-    ],
-  },
-  {
-    id: "plan2",
-    name: "Day 2",
-    meals: [
-      { label: "Breakfast", name: "200g non-fat Greek yoghurt + 20g chia seeds", protein: 23, fat: 7, carbs: 16, kcal: 207 },
-      { label: "Lunch", name: "120g turkey breast + 150g mixed salad + 20g olive oil", protein: 38, fat: 22, carbs: 5, kcal: 369 },
-      { label: "Snack", name: "150g cottage cheese + 30g almonds", protein: 22, fat: 24, carbs: 10, kcal: 330 },
-      { label: "Dinner", name: "170g chicken thigh + 30g peanut butter + 150g courgette + 14g olive oil", protein: 53, fat: 48, carbs: 11, kcal: 632 },
-      { label: "Shake", name: "1 scoop whey (30g) + water", protein: 24, fat: 2, carbs: 3, kcal: 120 },
-    ],
-  },
-  {
-    id: "plan3",
-    name: "Day 3",
-    meals: [
-      { label: "Breakfast", name: "3 whole eggs + 2 egg whites, scrambled, 50g spinach", protein: 28, fat: 15, carbs: 3, kcal: 262 },
-      { label: "Lunch", name: "260g firm tofu + 150g mixed salad + 6g sesame oil", protein: 45, fat: 30, carbs: 10, kcal: 457 },
-      { label: "Snack", name: "2 hard-boiled eggs + 15g almonds", protein: 16, fat: 17, carbs: 4, kcal: 231 },
-      { label: "Dinner", name: "135g duck breast + 100g cauliflower + 120g sweet potato", protein: 30, fat: 38, carbs: 29, kcal: 583 },
-      { label: "Shake", name: "1 scoop whey (30g) + 200ml almond milk", protein: 25, fat: 4, carbs: 4, kcal: 150 },
-    ],
-  },
-  {
-    id: "plan4",
-    name: "Day 4",
-    meals: [
-      { label: "Breakfast", name: "1 scoop whey + 25g almond butter + 200ml almond milk + 80g banana, blended", protein: 31, fat: 18, carbs: 27, kcal: 375 },
-      { label: "Lunch", name: "160g haddock + 150g mixed salad + 22g olive oil", protein: 41, fat: 24, carbs: 5, kcal: 410 },
-      { label: "Snack", name: "100g non-fat cheese + 100g celery sticks", protein: 14, fat: 1, carbs: 7, kcal: 86 },
-      { label: "Dinner", name: "120g firm tofu + 100g smoked salmon + 30g olive oil + 60g avocado + 60g spinach", protein: 40, fat: 54, carbs: 10, kcal: 665 },
-      { label: "Shake", name: "1 scoop whey (30g) + water", protein: 24, fat: 2, carbs: 3, kcal: 120 },
-    ],
-  },
-  {
-    id: "plan5",
-    name: "Day 5",
-    meals: [
-      { label: "Breakfast", name: "2 whole eggs + 12g oats + 150ml almond milk + 12g almond butter", protein: 18, fat: 19, carbs: 12, kcal: 287 },
-      { label: "Lunch", name: "180g prawns + 150g mixed salad + 22g olive oil + 60g avocado", protein: 47, fat: 34, carbs: 10, kcal: 499 },
-      { label: "Snack", name: "80g edamame + 1 whole egg", protein: 15, fat: 9, carbs: 8, kcal: 169 },
-      { label: "Dinner", name: "160g turkey mince + 40g brown rice + 120g broccoli + 20g olive oil", protein: 49, fat: 34, carbs: 18, kcal: 544 },
-      { label: "Shake", name: "1 scoop whey (30g) + water", protein: 24, fat: 2, carbs: 3, kcal: 120 },
-    ],
-  },
-  {
-    id: "plan6",
-    name: "Day 6",
-    meals: [
-      { label: "Breakfast", name: "180g 0% Greek yoghurt + 15g granola + 10g walnuts", protein: 21, fat: 9, carbs: 17, kcal: 235 },
-      { label: "Lunch", name: "160g salmon fillet + 35g quinoa + 60g spinach + 10g olive oil", protein: 43, fat: 32, carbs: 10, kcal: 477 },
-      { label: "Snack", name: "90g tinned tuna + 70g avocado", protein: 25, fat: 11, carbs: 6, kcal: 216 },
-      { label: "Dinner", name: "145g beef steak + 40g sweet potato + 120g green beans + 26g olive oil", protein: 45, fat: 41, carbs: 16, kcal: 602 },
-      { label: "Shake", name: "1 scoop whey (30g) + 200ml almond milk", protein: 25, fat: 4, carbs: 4, kcal: 150 },
-    ],
-  },
-  {
-    id: "plan7",
-    name: "Day 7",
-    meals: [
-      { label: "Breakfast", name: "180g cottage cheese + 50g pineapple + 20g walnuts", protein: 22, fat: 24, carbs: 13, kcal: 343 },
-      { label: "Lunch", name: "140g chicken breast + 30g chickpeas + 100g mixed salad + 24g olive oil", protein: 48, fat: 30, carbs: 11, kcal: 512 },
-      { label: "Snack", name: "60g hummus + 60g carrot sticks", protein: 5, fat: 6, carbs: 13, kcal: 131 },
-      { label: "Dinner", name: "170g pork tenderloin + 30g lentils + 120g broccoli + 29g olive oil", protein: 52, fat: 36, carbs: 14, kcal: 575 },
-      { label: "Shake", name: "1 scoop whey (30g) + water", protein: 24, fat: 2, carbs: 3, kcal: 120 },
-    ],
-  },
-  {
-    id: "plan8",
-    name: "Day 8",
-    meals: [
-      { label: "Breakfast", name: "2 whole eggs + 2 egg whites + 15g oats + 40g mixed berries", protein: 22, fat: 11, carbs: 16, kcal: 257 },
-      { label: "Lunch", name: "170g turkey breast + 150g mixed salad + 20g olive oil", protein: 52, fat: 22, carbs: 5, kcal: 436 },
-      { label: "Snack", name: "70g apple + 15g almond butter", protein: 3, fat: 8, carbs: 13, kcal: 129 },
-      { label: "Dinner", name: "190g cod + 32g coconut oil + 120g avocado + 100g green beans", protein: 48, fat: 52, carbs: 18, kcal: 698 },
-      { label: "Shake", name: "1 scoop whey (30g) + 200ml almond milk", protein: 25, fat: 4, carbs: 4, kcal: 150 },
-    ],
-  },
-];
+// Nutrition per 100g unless the entry has a `unit` (grams per single unit, e.g. 1 egg, 1 scoop).
+const INGREDIENTS = {
+  chicken_breast: { p: 31, f: 3.6, c: 0, kcal: 165 },
+  chicken_thigh: { p: 26, f: 11, c: 0, kcal: 180 },
+  turkey_breast: { p: 29, f: 1, c: 0, kcal: 135 },
+  turkey_mince: { p: 28, f: 8, c: 0, kcal: 176 },
+  cod: { p: 23, f: 1, c: 0, kcal: 105 },
+  haddock: { p: 24, f: 0.9, c: 0, kcal: 116 },
+  duck_breast: { p: 19, f: 28, c: 0, kcal: 337 },
+  salmon_fillet: { p: 25, f: 13, c: 0, kcal: 208 },
+  smoked_salmon: { p: 18, f: 4.3, c: 0, kcal: 117 },
+  tuna_canned: { p: 26, f: 0.8, c: 0, kcal: 116 },
+  prawns: { p: 24, f: 1.4, c: 0.2, kcal: 99 },
+  beef_steak: { p: 29, f: 10, c: 0, kcal: 207 },
+  pork_tenderloin: { p: 27, f: 4, c: 0, kcal: 143 },
+  firm_tofu: { p: 16, f: 9, c: 2, kcal: 144 },
+  cottage_cheese: { p: 10.3, f: 6, c: 2.2, kcal: 104 },
+  greek_yogurt_0: { p: 10, f: 0.2, c: 3.6, kcal: 55 },
+  nonfat_cheese: { p: 13, f: 0.5, c: 4, kcal: 72 },
+  olive_oil: { p: 0, f: 100, c: 0, kcal: 884 },
+  coconut_oil: { p: 0, f: 100, c: 0, kcal: 862 },
+  sesame_oil: { p: 0, f: 100, c: 0, kcal: 884 },
+  peanut_butter: { p: 25, f: 50, c: 20, kcal: 588 },
+  almond_butter: { p: 21, f: 55, c: 19, kcal: 614 },
+  avocado: { p: 2, f: 15, c: 9, kcal: 160 },
+  almonds: { p: 21, f: 49, c: 22, kcal: 579 },
+  walnuts: { p: 15, f: 65, c: 14, kcal: 654 },
+  chia_seeds: { p: 17, f: 31, c: 42, kcal: 486 },
+  granola: { p: 10, f: 16, c: 64, kcal: 471 },
+  almond_milk: { p: 0.6, f: 1.1, c: 0.3, kcal: 15 },
+  mixed_salad: { p: 2, f: 0.3, c: 3, kcal: 20 },
+  spinach: { p: 2.9, f: 0.4, c: 3.6, kcal: 23 },
+  cauliflower: { p: 2, f: 0.3, c: 5, kcal: 25 },
+  courgette: { p: 1.2, f: 0.3, c: 3.4, kcal: 17 },
+  green_beans: { p: 1.8, f: 0.1, c: 7, kcal: 31 },
+  celery: { p: 0.7, f: 0.2, c: 3, kcal: 14 },
+  carrot: { p: 0.9, f: 0.2, c: 10, kcal: 41 },
+  broccoli: { p: 2.8, f: 0.4, c: 7, kcal: 34 },
+  mixed_berries: { p: 0.7, f: 0.3, c: 12, kcal: 52 },
+  pineapple: { p: 0.5, f: 0.1, c: 13, kcal: 50 },
+  apple: { p: 0.3, f: 0.2, c: 14, kcal: 52 },
+  banana: { p: 1.1, f: 0.3, c: 23, kcal: 89 },
+  oats: { p: 13, f: 7, c: 67, kcal: 389 },
+  brown_rice: { p: 2.6, f: 0.9, c: 23, kcal: 112 },
+  quinoa: { p: 4.4, f: 1.9, c: 21, kcal: 120 },
+  sweet_potato: { p: 2, f: 0.1, c: 20, kcal: 86 },
+  lentils: { p: 9, f: 0.4, c: 20, kcal: 116 },
+  chickpeas: { p: 8.9, f: 2.6, c: 27, kcal: 164 },
+  hummus: { p: 8, f: 10, c: 11, kcal: 177 },
+  edamame: { p: 11, f: 5, c: 10, kcal: 121 },
+  egg_whole: { unit: 50, p: 6.3, f: 4.8, c: 0.4, kcal: 72 },
+  egg_white: { unit: 33, p: 3.6, f: 0, c: 0.2, kcal: 17 },
+  whey: { unit: 30, p: 24, f: 1.5, c: 3, kcal: 120 },
+  water: { p: 0, f: 0, c: 0, kcal: 0 },
+};
 
-function sumMacros(meals) {
-  return meals.reduce(
-    (t, m) => ({
-      protein: t.protein + m.protein,
-      fat: t.fat + m.fat,
-      carbs: t.carbs + m.carbs,
-      kcal: t.kcal + m.kcal,
-    }),
-    { protein: 0, fat: 0, carbs: 0, kcal: 0 }
+const LIQUID_IDS = new Set(["almond_milk", "water"]);
+const SCOOP_IDS = new Set(["whey"]);
+
+function ingredientMacros(id, grams) {
+  const d = INGREDIENTS[id];
+  const n = d.unit ? grams / d.unit : grams / 100;
+  return { p: d.p * n, f: d.f * n, c: d.c * n, kcal: d.kcal * n };
+}
+
+function itemMacros(ingredients, scale) {
+  return ingredients.reduce(
+    (t, ing) => {
+      const m = ingredientMacros(ing.id, ing.grams * scale);
+      return { p: t.p + m.p, f: t.f + m.f, c: t.c + m.c, kcal: t.kcal + m.kcal };
+    },
+    { p: 0, f: 0, c: 0, kcal: 0 }
   );
 }
+
+function formatIngredient(ing, scale) {
+  const grams = Math.round((ing.grams * scale) / 5) * 5;
+  if (SCOOP_IDS.has(ing.id)) {
+    const scoops = Math.round((grams / 30) * 2) / 2;
+    return `${scoops} scoop${scoops === 1 ? "" : "s"} ${ing.label} (${grams}g)`;
+  }
+  const unit = LIQUID_IDS.has(ing.id) ? "ml" : "g";
+  return `${grams}${unit} ${ing.label}`;
+}
+
+function formatItemName(ingredients, scale) {
+  return ingredients.map((ing) => formatIngredient(ing, scale)).join(" + ");
+}
+
+const MEAL_OPTIONS = {
+  Breakfast: [
+    { id: "b1", ingredients: [{ id: "greek_yogurt_0", grams: 150, label: "0% Greek yoghurt" }, { id: "whey", grams: 30, label: "whey" }] },
+    { id: "b2", ingredients: [{ id: "greek_yogurt_0", grams: 200, label: "non-fat Greek yoghurt" }, { id: "chia_seeds", grams: 20, label: "chia seeds" }] },
+    { id: "b3", ingredients: [{ id: "egg_whole", grams: 150, label: "whole eggs" }, { id: "egg_white", grams: 66, label: "egg whites" }, { id: "spinach", grams: 50, label: "spinach" }] },
+    { id: "b4", ingredients: [{ id: "whey", grams: 30, label: "whey" }, { id: "almond_butter", grams: 25, label: "almond butter" }, { id: "almond_milk", grams: 200, label: "almond milk" }, { id: "banana", grams: 80, label: "banana" }] },
+    { id: "b5", ingredients: [{ id: "egg_whole", grams: 100, label: "whole eggs" }, { id: "oats", grams: 12, label: "oats" }, { id: "almond_milk", grams: 150, label: "almond milk" }, { id: "almond_butter", grams: 12, label: "almond butter" }] },
+    { id: "b6", ingredients: [{ id: "greek_yogurt_0", grams: 180, label: "0% Greek yoghurt" }, { id: "granola", grams: 15, label: "granola" }, { id: "walnuts", grams: 10, label: "walnuts" }] },
+    { id: "b7", ingredients: [{ id: "cottage_cheese", grams: 180, label: "cottage cheese" }, { id: "pineapple", grams: 50, label: "pineapple" }, { id: "walnuts", grams: 20, label: "walnuts" }] },
+    { id: "b8", ingredients: [{ id: "egg_whole", grams: 100, label: "whole eggs" }, { id: "egg_white", grams: 66, label: "egg whites" }, { id: "oats", grams: 15, label: "oats" }, { id: "mixed_berries", grams: 40, label: "mixed berries" }] },
+  ],
+  Lunch: [
+    { id: "l1", ingredients: [{ id: "chicken_breast", grams: 100, label: "chicken breast" }, { id: "mixed_salad", grams: 150, label: "mixed salad" }, { id: "olive_oil", grams: 15, label: "olive oil" }] },
+    { id: "l2", ingredients: [{ id: "turkey_breast", grams: 120, label: "turkey breast" }, { id: "mixed_salad", grams: 150, label: "mixed salad" }, { id: "olive_oil", grams: 20, label: "olive oil" }] },
+    { id: "l3", ingredients: [{ id: "firm_tofu", grams: 260, label: "firm tofu" }, { id: "mixed_salad", grams: 150, label: "mixed salad" }, { id: "sesame_oil", grams: 6, label: "sesame oil" }] },
+    { id: "l4", ingredients: [{ id: "haddock", grams: 160, label: "haddock" }, { id: "mixed_salad", grams: 150, label: "mixed salad" }, { id: "olive_oil", grams: 22, label: "olive oil" }] },
+    { id: "l5", ingredients: [{ id: "prawns", grams: 180, label: "prawns" }, { id: "mixed_salad", grams: 150, label: "mixed salad" }, { id: "olive_oil", grams: 22, label: "olive oil" }, { id: "avocado", grams: 60, label: "avocado" }] },
+    { id: "l6", ingredients: [{ id: "salmon_fillet", grams: 160, label: "salmon fillet" }, { id: "quinoa", grams: 35, label: "quinoa" }, { id: "spinach", grams: 60, label: "spinach" }, { id: "olive_oil", grams: 10, label: "olive oil" }] },
+    { id: "l7", ingredients: [{ id: "chicken_breast", grams: 140, label: "chicken breast" }, { id: "chickpeas", grams: 30, label: "chickpeas" }, { id: "mixed_salad", grams: 100, label: "mixed salad" }, { id: "olive_oil", grams: 24, label: "olive oil" }] },
+    { id: "l8", ingredients: [{ id: "turkey_breast", grams: 170, label: "turkey breast" }, { id: "mixed_salad", grams: 150, label: "mixed salad" }, { id: "olive_oil", grams: 20, label: "olive oil" }] },
+  ],
+  Snack: [
+    { id: "s1", ingredients: [{ id: "cottage_cheese", grams: 120, label: "cottage cheese" }, { id: "walnuts", grams: 28, label: "walnuts" }, { id: "mixed_berries", grams: 80, label: "mixed berries" }] },
+    { id: "s2", ingredients: [{ id: "cottage_cheese", grams: 150, label: "cottage cheese" }, { id: "almonds", grams: 30, label: "almonds" }] },
+    { id: "s3", ingredients: [{ id: "egg_whole", grams: 100, label: "hard-boiled eggs" }, { id: "almonds", grams: 15, label: "almonds" }] },
+    { id: "s4", ingredients: [{ id: "nonfat_cheese", grams: 100, label: "non-fat cheese" }, { id: "celery", grams: 100, label: "celery sticks" }] },
+    { id: "s5", ingredients: [{ id: "edamame", grams: 80, label: "edamame" }, { id: "egg_whole", grams: 50, label: "whole egg" }] },
+    { id: "s6", ingredients: [{ id: "tuna_canned", grams: 90, label: "tinned tuna" }, { id: "avocado", grams: 70, label: "avocado" }] },
+    { id: "s7", ingredients: [{ id: "hummus", grams: 60, label: "hummus" }, { id: "carrot", grams: 60, label: "carrot sticks" }] },
+    { id: "s8", ingredients: [{ id: "apple", grams: 70, label: "apple" }, { id: "almond_butter", grams: 15, label: "almond butter" }] },
+  ],
+  Dinner: [
+    { id: "d1", ingredients: [{ id: "cod", grams: 160, label: "cod" }, { id: "olive_oil", grams: 24, label: "olive oil" }, { id: "avocado", grams: 150, label: "avocado" }] },
+    { id: "d2", ingredients: [{ id: "chicken_thigh", grams: 170, label: "chicken thigh" }, { id: "peanut_butter", grams: 30, label: "peanut butter" }, { id: "courgette", grams: 150, label: "courgette" }, { id: "olive_oil", grams: 14, label: "olive oil" }] },
+    { id: "d3", ingredients: [{ id: "duck_breast", grams: 135, label: "duck breast" }, { id: "cauliflower", grams: 100, label: "cauliflower" }, { id: "sweet_potato", grams: 120, label: "sweet potato" }] },
+    { id: "d4", ingredients: [{ id: "firm_tofu", grams: 120, label: "firm tofu" }, { id: "smoked_salmon", grams: 100, label: "smoked salmon" }, { id: "olive_oil", grams: 30, label: "olive oil" }, { id: "avocado", grams: 60, label: "avocado" }, { id: "spinach", grams: 60, label: "spinach" }] },
+    { id: "d5", ingredients: [{ id: "turkey_mince", grams: 160, label: "turkey mince" }, { id: "brown_rice", grams: 40, label: "brown rice" }, { id: "broccoli", grams: 120, label: "broccoli" }, { id: "olive_oil", grams: 20, label: "olive oil" }] },
+    { id: "d6", ingredients: [{ id: "beef_steak", grams: 145, label: "beef steak" }, { id: "sweet_potato", grams: 40, label: "sweet potato" }, { id: "green_beans", grams: 120, label: "green beans" }, { id: "olive_oil", grams: 26, label: "olive oil" }] },
+    { id: "d7", ingredients: [{ id: "pork_tenderloin", grams: 170, label: "pork tenderloin" }, { id: "lentils", grams: 30, label: "lentils" }, { id: "broccoli", grams: 120, label: "broccoli" }, { id: "olive_oil", grams: 29, label: "olive oil" }] },
+    { id: "d8", ingredients: [{ id: "cod", grams: 190, label: "cod" }, { id: "coconut_oil", grams: 32, label: "coconut oil" }, { id: "avocado", grams: 120, label: "avocado" }, { id: "green_beans", grams: 100, label: "green beans" }] },
+  ],
+  Shake: [
+    { id: "p1", ingredients: [{ id: "whey", grams: 30, label: "whey" }, { id: "almond_milk", grams: 200, label: "almond milk" }] },
+    { id: "p2", ingredients: [{ id: "whey", grams: 30, label: "whey" }, { id: "water", grams: 250, label: "water" }] },
+  ],
+};
 
 function MacroBar({ label, value, target, unit, color }) {
   const pct = Math.min(100, (value / target) * 100);
@@ -130,17 +163,39 @@ function MacroBar({ label, value, target, unit, color }) {
   );
 }
 
+const CATEGORIES = ["Breakfast", "Lunch", "Snack", "Dinner", "Shake"];
+const EMPTY_SELECTION = { Breakfast: null, Lunch: null, Snack: null, Dinner: null, Shake: null };
+
 export default function MacroPlanner() {
-  const [selectedPlanId, setSelectedPlanId] = useState(null);
+  const [selected, setSelected] = useState(EMPTY_SELECTION);
 
-  const selectedPlan = DAY_PLANS.find((p) => p.id === selectedPlanId) || null;
-  const totals = selectedPlan ? sumMacros(selectedPlan.meals) : { protein: 0, fat: 0, carbs: 0, kcal: 0 };
+  const totals = useMemo(() => {
+    const t = { p: 0, f: 0, c: 0, kcal: 0 };
+    for (const cat of CATEGORIES) {
+      const sel = selected[cat];
+      if (!sel) continue;
+      const option = MEAL_OPTIONS[cat].find((o) => o.id === sel.optionId);
+      if (!option) continue;
+      const m = itemMacros(option.ingredients, sel.scale);
+      t.p += m.p; t.f += m.f; t.c += m.c; t.kcal += m.kcal;
+    }
+    return t;
+  }, [selected]);
 
-  const selectPlan = (id) => {
-    setSelectedPlanId((prev) => (prev === id ? null : id));
+  const selectOption = (cat, optionId) => {
+    setSelected((prev) => {
+      if (prev[cat] && prev[cat].optionId === optionId) {
+        return { ...prev, [cat]: null };
+      }
+      return { ...prev, [cat]: { optionId, scale: 1 } };
+    });
   };
 
-  const reset = () => setSelectedPlanId(null);
+  const setScale = (cat, scale) => {
+    setSelected((prev) => ({ ...prev, [cat]: { ...prev[cat], scale } }));
+  };
+
+  const reset = () => setSelected(EMPTY_SELECTION);
 
   return (
     <div
@@ -172,7 +227,7 @@ export default function MacroPlanner() {
           </button>
         </div>
         <p style={{ fontSize: 13, color: "#777", marginTop: 0, marginBottom: 20 }}>
-          Pick a full day plan below. Each one is pre-balanced to fit your daily targets.
+          Pick any food for each meal, then use the portion slider to nudge the totals onto target.
         </p>
 
         <div
@@ -189,108 +244,115 @@ export default function MacroPlanner() {
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-            <span style={{ fontWeight: 700, fontSize: 14, color: "#111" }}>
-              {selectedPlan ? `${selectedPlan.name} — today's totals` : "Today's totals"}
-            </span>
+            <span style={{ fontWeight: 700, fontSize: 14, color: "#111" }}>Today's totals</span>
             <span style={{ fontSize: 22, fontWeight: 800, color: "#d61f2c" }}>{totals.kcal.toFixed(0)} kcal</span>
           </div>
-          <MacroBar label="Protein" value={totals.protein} target={TARGETS.protein} unit="g" color="#d61f2c" />
-          <MacroBar label="Fat" value={totals.fat} target={TARGETS.fat} unit="g" color="#2c3e50" />
-          <MacroBar label="Carbs" value={totals.carbs} target={TARGETS.carbs} unit="g" color="#7f8c8d" />
+          <MacroBar label="Protein" value={totals.p} target={TARGETS.protein} unit="g" color="#d61f2c" />
+          <MacroBar label="Fat" value={totals.f} target={TARGETS.fat} unit="g" color="#2c3e50" />
+          <MacroBar label="Carbs" value={totals.c} target={TARGETS.carbs} unit="g" color="#7f8c8d" />
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {DAY_PLANS.map((plan) => {
-            const isSelected = selectedPlanId === plan.id;
-            const planTotals = sumMacros(plan.meals);
-            return (
-              <div
-                key={plan.id}
-                onClick={() => selectPlan(plan.id)}
-                style={{
-                  background: isSelected ? "#111" : "#fff",
-                  color: isSelected ? "#fff" : "#222",
-                  border: isSelected ? "2px solid #111" : "2px solid #eaeaea",
-                  borderRadius: 12,
-                  padding: "16px 18px",
-                  cursor: "pointer",
-                  transition: "all 0.15s ease",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                  <span
-                    style={{
-                      width: 22,
-                      height: 22,
-                      flexShrink: 0,
-                      borderRadius: "50%",
-                      border: isSelected ? "none" : "2px solid #ccc",
-                      background: isSelected ? "#d61f2c" : "transparent",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 13,
-                      color: "#fff",
-                    }}
-                  >
-                    {isSelected ? "✓" : ""}
-                  </span>
-                  <span style={{ fontSize: 16, fontWeight: 700 }}>{plan.name}</span>
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 12 }}>
-                  {plan.meals.map((meal) => (
+        {CATEGORIES.map((cat) => (
+          <div key={cat} style={{ marginBottom: 22 }}>
+            <h2
+              style={{
+                fontSize: 12,
+                letterSpacing: 1,
+                textTransform: "uppercase",
+                color: "#999",
+                fontWeight: 700,
+                marginBottom: 8,
+              }}
+            >
+              {cat}
+            </h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {MEAL_OPTIONS[cat].map((option) => {
+                const sel = selected[cat];
+                const isSelected = sel && sel.optionId === option.id;
+                const scale = isSelected ? sel.scale : 1;
+                const m = itemMacros(option.ingredients, scale);
+                return (
+                  <div key={option.id}>
                     <div
-                      key={meal.label}
+                      onClick={() => selectOption(cat, option.id)}
                       style={{
                         display: "flex",
                         justifyContent: "space-between",
-                        alignItems: "baseline",
+                        alignItems: "center",
                         gap: 12,
-                        fontSize: 13,
+                        minHeight: 44,
+                        background: isSelected ? "#111" : "#fff",
+                        color: isSelected ? "#fff" : "#222",
+                        border: isSelected ? "2px solid #111" : "2px solid #eaeaea",
+                        borderRadius: isSelected ? "10px 10px 0 0" : 10,
+                        padding: "12px 16px",
+                        cursor: "pointer",
+                        transition: "all 0.15s ease",
                       }}
                     >
-                      <span style={{ color: isSelected ? "#ddd" : "#444" }}>
-                        <span style={{ fontWeight: 600, color: isSelected ? "#fff" : "#111" }}>{meal.label}:</span>{" "}
-                        {meal.name}
+                      <span
+                        style={{
+                          width: 20,
+                          height: 20,
+                          flexShrink: 0,
+                          borderRadius: "50%",
+                          border: isSelected ? "none" : "2px solid #ccc",
+                          background: isSelected ? "#d61f2c" : "transparent",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: 12,
+                          color: "#fff",
+                        }}
+                      >
+                        {isSelected ? "✓" : ""}
+                      </span>
+                      <span style={{ fontSize: 14, fontWeight: isSelected ? 600 : 500, flex: 1 }}>
+                        {formatItemName(option.ingredients, scale)}
                       </span>
                       <span
                         style={{
-                          fontSize: 11.5,
+                          fontSize: 12,
                           whiteSpace: "nowrap",
-                          color: isSelected ? "#999" : "#999",
+                          color: isSelected ? "#ccc" : "#999",
                           fontVariantNumeric: "tabular-nums",
                         }}
                       >
-                        {meal.kcal}kcal
+                        P{m.p.toFixed(0)} F{m.f.toFixed(0)} C{m.c.toFixed(0)} · {m.kcal.toFixed(0)}kcal
                       </span>
                     </div>
-                  ))}
-                </div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    paddingTop: 10,
-                    borderTop: isSelected ? "1px solid #333" : "1px solid #eee",
-                    fontSize: 12.5,
-                    fontVariantNumeric: "tabular-nums",
-                    color: isSelected ? "#ccc" : "#666",
-                  }}
-                >
-                  <span>
-                    P{planTotals.protein} · F{planTotals.fat} · C{planTotals.carbs}
-                  </span>
-                  <span style={{ fontWeight: 700, color: isSelected ? "#fff" : "#111" }}>
-                    {planTotals.kcal} kcal
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                    {isSelected && (
+                      <div
+                        style={{
+                          background: "#1c1c1c",
+                          borderRadius: "0 0 10px 10px",
+                          padding: "10px 16px 14px",
+                          border: "2px solid #111",
+                          borderTop: "none",
+                        }}
+                      >
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#aaa", marginBottom: 4 }}>
+                          <span>Portion</span>
+                          <span style={{ fontVariantNumeric: "tabular-nums" }}>{Math.round(scale * 100)}%</span>
+                        </div>
+                        <input
+                          type="range"
+                          min={50}
+                          max={150}
+                          step={5}
+                          value={Math.round(scale * 100)}
+                          onChange={(e) => setScale(cat, Number(e.target.value) / 100)}
+                          style={{ width: "100%", accentColor: "#d61f2c" }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
