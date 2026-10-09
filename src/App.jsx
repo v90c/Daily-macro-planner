@@ -138,6 +138,44 @@ const MEAL_OPTIONS = {
   ],
 };
 
+const CATEGORIES = ["Breakfast", "Lunch", "Snack", "Dinner", "Shake"];
+
+// Each day is a set of option ids, one per category, pre-balanced to land close to target.
+const CURATED_DAYS = [
+  { id: "day1", name: "Day 1", slots: { Breakfast: "b1", Lunch: "l1", Snack: "s1", Dinner: "d1", Shake: "p1" } },
+  { id: "day2", name: "Day 2", slots: { Breakfast: "b2", Lunch: "l2", Snack: "s2", Dinner: "d2", Shake: "p2" } },
+  { id: "day3", name: "Day 3", slots: { Breakfast: "b3", Lunch: "l3", Snack: "s3", Dinner: "d3", Shake: "p1" } },
+  { id: "day4", name: "Day 4", slots: { Breakfast: "b4", Lunch: "l4", Snack: "s4", Dinner: "d4", Shake: "p2" } },
+  { id: "day5", name: "Day 5", slots: { Breakfast: "b5", Lunch: "l5", Snack: "s5", Dinner: "d5", Shake: "p2" } },
+  { id: "day6", name: "Day 6", slots: { Breakfast: "b6", Lunch: "l6", Snack: "s6", Dinner: "d6", Shake: "p1" } },
+  { id: "day7", name: "Day 7", slots: { Breakfast: "b7", Lunch: "l7", Snack: "s7", Dinner: "d7", Shake: "p2" } },
+  { id: "day8", name: "Day 8", slots: { Breakfast: "b8", Lunch: "l8", Snack: "s8", Dinner: "d8", Shake: "p1" } },
+];
+
+function findOption(cat, id) {
+  return MEAL_OPTIONS[cat].find((o) => o.id === id);
+}
+
+function configTotals(config) {
+  const t = { p: 0, f: 0, c: 0, kcal: 0 };
+  for (const cat of CATEGORIES) {
+    const slot = config[cat];
+    if (!slot) continue;
+    const option = findOption(cat, slot.optionId);
+    const m = itemMacros(option.ingredients, slot.scale);
+    t.p += m.p; t.f += m.f; t.c += m.c; t.kcal += m.kcal;
+  }
+  return t;
+}
+
+function configFromDay(day) {
+  const config = {};
+  for (const cat of CATEGORIES) {
+    config[cat] = { optionId: day.slots[cat], scale: 1 };
+  }
+  return config;
+}
+
 function MacroBar({ label, value, target, unit, color }) {
   const pct = Math.min(100, (value / target) * 100);
   const over = value > target;
@@ -163,39 +201,44 @@ function MacroBar({ label, value, target, unit, color }) {
   );
 }
 
-const CATEGORIES = ["Breakfast", "Lunch", "Snack", "Dinner", "Shake"];
-const EMPTY_SELECTION = { Breakfast: null, Lunch: null, Snack: null, Dinner: null, Shake: null };
-
 export default function MacroPlanner() {
-  const [selected, setSelected] = useState(EMPTY_SELECTION);
+  const [selectedDayId, setSelectedDayId] = useState(null);
+  const [config, setConfig] = useState(null);
+  const [swapOpenCat, setSwapOpenCat] = useState(null);
 
-  const totals = useMemo(() => {
-    const t = { p: 0, f: 0, c: 0, kcal: 0 };
-    for (const cat of CATEGORIES) {
-      const sel = selected[cat];
-      if (!sel) continue;
-      const option = MEAL_OPTIONS[cat].find((o) => o.id === sel.optionId);
-      if (!option) continue;
-      const m = itemMacros(option.ingredients, sel.scale);
-      t.p += m.p; t.f += m.f; t.c += m.c; t.kcal += m.kcal;
+  const totals = useMemo(() => (config ? configTotals(config) : { p: 0, f: 0, c: 0, kcal: 0 }), [config]);
+
+  const selectDay = (day) => {
+    if (selectedDayId === day.id) {
+      setSelectedDayId(null);
+      setConfig(null);
+      setSwapOpenCat(null);
+      return;
     }
-    return t;
-  }, [selected]);
+    setSelectedDayId(day.id);
+    setConfig(configFromDay(day));
+    setSwapOpenCat(null);
+  };
 
-  const selectOption = (cat, optionId) => {
-    setSelected((prev) => {
-      if (prev[cat] && prev[cat].optionId === optionId) {
-        return { ...prev, [cat]: null };
-      }
-      return { ...prev, [cat]: { optionId, scale: 1 } };
+  const swapMeal = (cat, newOptionId) => {
+    setConfig((prev) => {
+      const prevSlot = prev[cat];
+      const prevOption = findOption(cat, prevSlot.optionId);
+      const prevKcal = itemMacros(prevOption.ingredients, prevSlot.scale).kcal;
+      const newOption = findOption(cat, newOptionId);
+      const newBaseKcal = itemMacros(newOption.ingredients, 1).kcal;
+      let scale = newBaseKcal > 0 ? prevKcal / newBaseKcal : 1;
+      scale = Math.max(0.5, Math.min(2, scale));
+      return { ...prev, [cat]: { optionId: newOptionId, scale } };
     });
+    setSwapOpenCat(null);
   };
 
-  const setScale = (cat, scale) => {
-    setSelected((prev) => ({ ...prev, [cat]: { ...prev[cat], scale } }));
+  const reset = () => {
+    setSelectedDayId(null);
+    setConfig(null);
+    setSwapOpenCat(null);
   };
-
-  const reset = () => setSelected(EMPTY_SELECTION);
 
   return (
     <div
@@ -227,24 +270,23 @@ export default function MacroPlanner() {
           </button>
         </div>
         <p style={{ fontSize: 13, color: "#777", marginTop: 0, marginBottom: 20 }}>
-          Pick any food for each meal, then use the portion slider to nudge the totals onto target.
+          Pick a day below. Each one is pre-balanced to fit your targets — tap any meal inside it to swap for something else.
         </p>
 
         <div
           style={{
-            position: "sticky",
-            top: 12,
-            zIndex: 20,
             background: "#fff",
             borderRadius: 12,
             padding: "18px 20px",
             marginBottom: 24,
             border: "1px solid #eee",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-            <span style={{ fontWeight: 700, fontSize: 14, color: "#111" }}>Today's totals</span>
+            <span style={{ fontWeight: 700, fontSize: 14, color: "#111" }}>
+              {selectedDayId ? `${CURATED_DAYS.find((d) => d.id === selectedDayId).name} — today's totals` : "Today's totals"}
+            </span>
             <span style={{ fontSize: 22, fontWeight: 800, color: "#d61f2c" }}>{totals.kcal.toFixed(0)} kcal</span>
           </div>
           <MacroBar label="Protein" value={totals.p} target={TARGETS.protein} unit="g" color="#d61f2c" />
@@ -252,107 +294,138 @@ export default function MacroPlanner() {
           <MacroBar label="Carbs" value={totals.c} target={TARGETS.carbs} unit="g" color="#7f8c8d" />
         </div>
 
-        {CATEGORIES.map((cat) => (
-          <div key={cat} style={{ marginBottom: 22 }}>
-            <h2
-              style={{
-                fontSize: 12,
-                letterSpacing: 1,
-                textTransform: "uppercase",
-                color: "#999",
-                fontWeight: 700,
-                marginBottom: 8,
-              }}
-            >
-              {cat}
-            </h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {MEAL_OPTIONS[cat].map((option) => {
-                const sel = selected[cat];
-                const isSelected = sel && sel.optionId === option.id;
-                const scale = isSelected ? sel.scale : 1;
-                const m = itemMacros(option.ingredients, scale);
-                return (
-                  <div key={option.id}>
-                    <div
-                      onClick={() => selectOption(cat, option.id)}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {CURATED_DAYS.map((day) => {
+            const isSelected = selectedDayId === day.id;
+            const baseConfig = configFromDay(day);
+            const baseTotals = configTotals(baseConfig);
+
+            return (
+              <div
+                key={day.id}
+                style={{
+                  background: isSelected ? "#111" : "#fff",
+                  color: isSelected ? "#fff" : "#222",
+                  border: isSelected ? "2px solid #111" : "2px solid #eaeaea",
+                  borderRadius: 12,
+                  padding: "14px 16px",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <div
+                  onClick={() => selectDay(day)}
+                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span
                       style={{
+                        width: 20,
+                        height: 20,
+                        flexShrink: 0,
+                        borderRadius: "50%",
+                        border: isSelected ? "none" : "2px solid #ccc",
+                        background: isSelected ? "#d61f2c" : "transparent",
                         display: "flex",
-                        justifyContent: "space-between",
                         alignItems: "center",
-                        gap: 12,
-                        minHeight: 44,
-                        background: isSelected ? "#111" : "#fff",
-                        color: isSelected ? "#fff" : "#222",
-                        border: isSelected ? "2px solid #111" : "2px solid #eaeaea",
-                        borderRadius: isSelected ? "10px 10px 0 0" : 10,
-                        padding: "12px 16px",
-                        cursor: "pointer",
-                        transition: "all 0.15s ease",
+                        justifyContent: "center",
+                        fontSize: 12,
+                        color: "#fff",
                       }}
                     >
-                      <span
-                        style={{
-                          width: 20,
-                          height: 20,
-                          flexShrink: 0,
-                          borderRadius: "50%",
-                          border: isSelected ? "none" : "2px solid #ccc",
-                          background: isSelected ? "#d61f2c" : "transparent",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: 12,
-                          color: "#fff",
-                        }}
-                      >
-                        {isSelected ? "✓" : ""}
-                      </span>
-                      <span style={{ fontSize: 14, fontWeight: isSelected ? 600 : 500, flex: 1 }}>
-                        {formatItemName(option.ingredients, scale)}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: 12,
-                          whiteSpace: "nowrap",
-                          color: isSelected ? "#ccc" : "#999",
-                          fontVariantNumeric: "tabular-nums",
-                        }}
-                      >
-                        P{m.p.toFixed(0)} F{m.f.toFixed(0)} C{m.c.toFixed(0)} · {m.kcal.toFixed(0)}kcal
-                      </span>
-                    </div>
-                    {isSelected && (
-                      <div
-                        style={{
-                          background: "#1c1c1c",
-                          borderRadius: "0 0 10px 10px",
-                          padding: "10px 16px 14px",
-                          border: "2px solid #111",
-                          borderTop: "none",
-                        }}
-                      >
-                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#aaa", marginBottom: 4 }}>
-                          <span>Portion</span>
-                          <span style={{ fontVariantNumeric: "tabular-nums" }}>{Math.round(scale * 100)}%</span>
-                        </div>
-                        <input
-                          type="range"
-                          min={50}
-                          max={150}
-                          step={5}
-                          value={Math.round(scale * 100)}
-                          onChange={(e) => setScale(cat, Number(e.target.value) / 100)}
-                          style={{ width: "100%", accentColor: "#d61f2c" }}
-                        />
-                      </div>
-                    )}
+                      {isSelected ? "✓" : ""}
+                    </span>
+                    <span style={{ fontSize: 15, fontWeight: 700 }}>{day.name}</span>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+                  <span
+                    style={{
+                      fontSize: 12,
+                      fontVariantNumeric: "tabular-nums",
+                      color: isSelected ? "#ccc" : "#888",
+                    }}
+                  >
+                    P{baseTotals.p.toFixed(0)} · F{baseTotals.f.toFixed(0)} · C{baseTotals.c.toFixed(0)} · {baseTotals.kcal.toFixed(0)}kcal
+                  </span>
+                </div>
+
+                {isSelected && (
+                  <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
+                    {CATEGORIES.map((cat) => {
+                      const slot = config[cat];
+                      const option = findOption(cat, slot.optionId);
+                      const m = itemMacros(option.ingredients, slot.scale);
+                      const swapOpen = swapOpenCat === cat;
+                      return (
+                        <div key={cat} style={{ background: "#1c1c1c", borderRadius: 8, padding: "10px 12px" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontSize: 11, color: "#999", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>
+                                {cat}
+                              </div>
+                              <div style={{ fontSize: 13.5 }}>{formatItemName(option.ingredients, slot.scale)}</div>
+                            </div>
+                            <span style={{ fontSize: 11.5, color: "#999", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>
+                              {m.kcal.toFixed(0)}kcal
+                            </span>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSwapOpenCat(swapOpen ? null : cat);
+                            }}
+                            style={{
+                              marginTop: 8,
+                              background: "none",
+                              border: "1px solid #444",
+                              color: "#ccc",
+                              fontSize: 11,
+                              borderRadius: 6,
+                              padding: "4px 10px",
+                              cursor: "pointer",
+                            }}
+                          >
+                            {swapOpen ? "Cancel" : "Swap"}
+                          </button>
+                          {swapOpen && (
+                            <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 6 }}>
+                              {MEAL_OPTIONS[cat]
+                                .filter((o) => o.id !== slot.optionId)
+                                .map((o) => {
+                                  const altKcal = itemMacros(o.ingredients, 1).kcal;
+                                  return (
+                                    <div
+                                      key={o.id}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        swapMeal(cat, o.id);
+                                      }}
+                                      style={{
+                                        background: "#2a2a2a",
+                                        borderRadius: 6,
+                                        padding: "8px 10px",
+                                        fontSize: 12.5,
+                                        color: "#ddd",
+                                        cursor: "pointer",
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        gap: 10,
+                                      }}
+                                    >
+                                      <span>{formatItemName(o.ingredients, 1)}</span>
+                                      <span style={{ color: "#888", whiteSpace: "nowrap" }}>{altKcal.toFixed(0)}kcal</span>
+                                    </div>
+                                  );
+                                })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
